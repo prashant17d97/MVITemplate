@@ -1,47 +1,64 @@
 package com.prashant.mvi.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+
+const val TAG = "HOME"
 
 @Composable
 fun Home(
-//    navHostController: NavHostController,
-    model: HomeModel,
-    onClick: (HomeIntent) -> Unit
+    post: List<Post> = listOf(),
+    loadData: () -> Unit = {},
+    isLoading: Boolean = false
 ) {
+    LaunchedEffect(key1 = Unit, block = { loadData() })
+    AnimatedVisibility(visible = isLoading) {
+        Dialog(onDismissRequest = {}) {
+            CircularProgressIndicator()
+        }
+    }
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(5.dp),
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Counter: ${model.counter}",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        Button(
-            onClick = { onClick(HomeIntent.Increment) },
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(text = "Increment")
-        }
-        Button(
-            onClick = { onClick(HomeIntent.Decrement) },
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(text = "Decrement")
+        LazyColumn {
+            items(post) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(5.dp, alignment = Alignment.Top),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(text = it.title?:"", style = MaterialTheme.typography.titleLarge)
+                    Text(text = "${it.id?:0}", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "${it.userId?:0}", style = MaterialTheme.typography.titleMedium)
+                    Text(text = it.body?:"", style = MaterialTheme.typography.titleMedium)
+                    Divider(
+                        modifier = Modifier
+                            .height(1.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -50,7 +67,11 @@ fun Home(
 @Composable
 fun HomePrev() {
     Home(
-//        navHostController = rememberNavController(),
-        model = HomeModel(counter = 0),
-        onClick = {})
+        post = listOf(
+            Post(userId = 8179, id = 8834, title = "urbanitas", body = "utroque"),
+            Post(userId = 8179, id = 8834, title = "urbanitas", body = "utroque"),
+            Post(userId = 8179, id = 8834, title = "urbanitas", body = "utroque"),
+            Post(userId = 8179, id = 8834, title = "urbanitas", body = "utroque"),
+        )
+    )
 }
